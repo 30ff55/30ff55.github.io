@@ -1,0 +1,27 @@
+const code = "// snapshot:index.js\nvar createScene = async function() {\n  var scene = new BABYLON.Scene(engine);\n  var camera = new BABYLON.FreeCamera(\"camera1\", new BABYLON.Vector3(0, 5, -10), scene);\n  camera.setTarget(BABYLON.Vector3.Zero());\n  camera.attachControl(canvas, true);\n  var light = new BABYLON.HemisphericLight(\"light\", new BABYLON.Vector3(0, 1, 0), scene);\n  light.intensity = 0.7;\n  var sphere = BABYLON.MeshBuilder.CreateSphere(\"sphere\", { diameter: 2, segments: 32 }, scene);\n  sphere.position.y = 1;\n  scene.createDefaultEnvironment();\n  const xrHelper = await scene.createDefaultXRExperienceAsync();\n  return scene;\n};\nvar index_default = createScene;\nexport {\n  index_default as default\n};\n//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsic25hcHNob3Q6aW5kZXguanMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbInZhciBjcmVhdGVTY2VuZSA9IGFzeW5jIGZ1bmN0aW9uICgpIHtcclxuXHJcbiAgICAvLyBUaGlzIGNyZWF0ZXMgYSBiYXNpYyBCYWJ5bG9uIFNjZW5lIG9iamVjdCAobm9uLW1lc2gpXHJcbiAgICB2YXIgc2NlbmUgPSBuZXcgQkFCWUxPTi5TY2VuZShlbmdpbmUpO1xyXG5cclxuICAgIC8vIFRoaXMgY3JlYXRlcyBhbmQgcG9zaXRpb25zIGEgZnJlZSBjYW1lcmEgKG5vbi1tZXNoKVxyXG4gICAgdmFyIGNhbWVyYSA9IG5ldyBCQUJZTE9OLkZyZWVDYW1lcmEoXCJjYW1lcmExXCIsIG5ldyBCQUJZTE9OLlZlY3RvcjMoMCwgNSwgLTEwKSwgc2NlbmUpO1xyXG5cclxuICAgIC8vIFRoaXMgdGFyZ2V0cyB0aGUgY2FtZXJhIHRvIHNjZW5lIG9yaWdpblxyXG4gICAgY2FtZXJhLnNldFRhcmdldChCQUJZTE9OLlZlY3RvcjMuWmVybygpKTtcclxuXHJcbiAgICAvLyBUaGlzIGF0dGFjaGVzIHRoZSBjYW1lcmEgdG8gdGhlIGNhbnZhc1xyXG4gICAgY2FtZXJhLmF0dGFjaENvbnRyb2woY2FudmFzLCB0cnVlKTtcclxuXHJcbiAgICAvLyBUaGlzIGNyZWF0ZXMgYSBsaWdodCwgYWltaW5nIDAsMSwwIC0gdG8gdGhlIHNreSAobm9uLW1lc2gpXHJcbiAgICB2YXIgbGlnaHQgPSBuZXcgQkFCWUxPTi5IZW1pc3BoZXJpY0xpZ2h0KFwibGlnaHRcIiwgbmV3IEJBQllMT04uVmVjdG9yMygwLCAxLCAwKSwgc2NlbmUpO1xyXG5cclxuICAgIC8vIERlZmF1bHQgaW50ZW5zaXR5IGlzIDEuIExldCdzIGRpbSB0aGUgbGlnaHQgYSBzbWFsbCBhbW91bnRcclxuICAgIGxpZ2h0LmludGVuc2l0eSA9IDAuNztcclxuXHJcbiAgICAvLyBPdXIgYnVpbHQtaW4gJ3NwaGVyZScgc2hhcGUuXHJcbiAgICB2YXIgc3BoZXJlID0gQkFCWUxPTi5NZXNoQnVpbGRlci5DcmVhdGVTcGhlcmUoXCJzcGhlcmVcIiwge2RpYW1ldGVyOiAyLCBzZWdtZW50czogMzJ9LCBzY2VuZSk7XHJcblxyXG4gICAgLy8gTW92ZSB0aGUgc3BoZXJlIHVwd2FyZCAxLzIgaXRzIGhlaWdodFxyXG4gICAgc3BoZXJlLnBvc2l0aW9uLnkgPSAxO1xyXG5cclxuICAgIHNjZW5lLmNyZWF0ZURlZmF1bHRFbnZpcm9ubWVudCgpO1xyXG5cclxuICAgIC8vIFhSXHJcbiAgICBjb25zdCB4ckhlbHBlciA9IGF3YWl0IHNjZW5lLmNyZWF0ZURlZmF1bHRYUkV4cGVyaWVuY2VBc3luYygpO1xyXG5cclxuICAgIHJldHVybiBzY2VuZTtcclxuXHJcbn07XHJcbmV4cG9ydCBkZWZhdWx0IGNyZWF0ZVNjZW5lXHJcblxuLy8jIHNvdXJjZVVSTD1maWxlOi8vL3BnL2luZGV4LmpzIl0sCiAgIm1hcHBpbmdzIjogIjtBQUFBLElBQUksY0FBYyxpQkFBa0I7QUFHaEMsTUFBSSxRQUFRLElBQUksUUFBUSxNQUFNLE1BQU07QUFHcEMsTUFBSSxTQUFTLElBQUksUUFBUSxXQUFXLFdBQVcsSUFBSSxRQUFRLFFBQVEsR0FBRyxHQUFHLEdBQUcsR0FBRyxLQUFLO0FBR3BGLFNBQU8sVUFBVSxRQUFRLFFBQVEsS0FBSyxDQUFDO0FBR3ZDLFNBQU8sY0FBYyxRQUFRLElBQUk7QUFHakMsTUFBSSxRQUFRLElBQUksUUFBUSxpQkFBaUIsU0FBUyxJQUFJLFFBQVEsUUFBUSxHQUFHLEdBQUcsQ0FBQyxHQUFHLEtBQUs7QUFHckYsUUFBTSxZQUFZO0FBR2xCLE1BQUksU0FBUyxRQUFRLFlBQVksYUFBYSxVQUFVLEVBQUMsVUFBVSxHQUFHLFVBQVUsR0FBRSxHQUFHLEtBQUs7QUFHMUYsU0FBTyxTQUFTLElBQUk7QUFFcEIsUUFBTSx5QkFBeUI7QUFHL0IsUUFBTSxXQUFXLE1BQU0sTUFBTSwrQkFBK0I7QUFFNUQsU0FBTztBQUVYO0FBQ0EsSUFBTyxnQkFBUTsiLAogICJuYW1lcyI6IFtdCn0K\n";
+const blob = new Blob([code], { type: 'text/javascript' });
+const url = URL.createObjectURL(blob);
+
+const BABYLON = window.BABYLON;
+const canvas = document.getElementById('renderCanvas');
+
+const mod = await import(url);
+
+let engine = null;
+if (typeof mod.createEngine === 'function') {
+  try { engine = await mod.createEngine(); } catch {}
+}
+if (!engine) {
+  engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+}
+window.engine = engine; window.canvas = canvas;
+
+let createScene = mod.createScene || mod.default;
+if (!createScene && mod.Playground?.CreateScene) createScene = (e,c)=>mod.Playground.CreateScene(e,c);
+if (!createScene) throw new Error('No createScene() export found.');
+
+const scene = await (createScene(engine, canvas) ?? createScene());
+engine.runRenderLoop(()=>scene.render());
+addEventListener('resize', ()=>engine.resize());
+
+addEventListener('unload', ()=> URL.revokeObjectURL(url));
