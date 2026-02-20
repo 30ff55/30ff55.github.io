@@ -48,5 +48,5 @@ export default function createScene(engine, canvas) {
         );
     });
 
-    return scene;
+    return { scene, xrHelper };
 };
