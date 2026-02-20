@@ -49,7 +49,7 @@ export default async function createScene(engine, canvas) {
                 motionController.rootMesh?.setEnabled(false);
 
                 // Load custom blaster
-                const result = await ImportMeshAsync("./assets/blaster.glb", this._scene);
+                const result = await ImportMeshAsync("assets/blaster.glb", this._scene);
                 // Create root transform node
                 const customRoot = new BABYLON.TransformNode("blasterRoot", scene);
 
