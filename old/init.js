@@ -12,7 +12,15 @@ const scene = createScene(engine, canvas);
 const xrHelper = await scene.createDefaultXRExperienceAsync();
 
 document.getElementById("enterVRBtn").addEventListener("click", () => {
-    xrHelper.baseExperience.enterXRAsync("immersive-vr", "local-floor");
+    xrHelper.baseExperience.enterXRAsync("immersive-vr", "local-floor")
+
+    xrHelper.baseExperience.onStateChangedObservable.add((state) => {
+        if (state === BABYLON.WebXRState.ENTERING_XR) {
+            canvas.style.display = "block";
+        } else if (state === BABYLON.WebXRState.EXITING_XR) {
+            canvas.style.display = "none";
+        }
+    });
 });
 
 engine.runRenderLoop(()=>scene.render());
