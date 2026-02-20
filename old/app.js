@@ -1,4 +1,4 @@
-const createScene = function () {
+export default function createScene() {
     // This creates a basic Babylon Scene object (non-mesh)
     var scene = new BABYLON.Scene(engine);
 
