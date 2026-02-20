@@ -9,5 +9,7 @@ window.canvas = canvas;
 
 const scene = createScene(engine, canvas);
 
+const xrHelper = await scene.createDefaultXRExperienceAsync();
+
 engine.runRenderLoop(()=>scene.render());
 addEventListener('resize', ()=>engine.resize());
