@@ -28,8 +28,8 @@
     local scene = new(THREE.Scene)
     local camera = new(THREE.PerspectiveCamera, 75, js.global.innerWidth / js.global.innerHeight, 0.1, 1000)
     local renderer = new(THREE.WebGLRenderer, conv({antialias=true}))
-    renderer:setSize(js.global.innerWidth, js.global.innerHeight)
-    js.global.document.body:appendChild(renderer.domElement)
+    renderer:setSize(window.innerWidth, window.innerHeight)
+    document.body:appendChild(renderer.domElement)
 
     local light = new(THREE.DirectionalLight, 0xffffff, 1)
     light.position:set(5, 10, 7.5)
