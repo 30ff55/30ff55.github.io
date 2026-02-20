@@ -18,16 +18,18 @@ export default async function createScene(engine, canvas) {
     // --- VR Setup ---
     const xrHelper = await scene.createDefaultXRExperienceAsync();
 
-    // Helper function to replace controller meshes
+    // Helper function to replace a controller mesh
     const replaceControllerMesh = (controller) => {
-
-        // Wait for motion controller initialization
         controller.onMotionControllerInitObservable.add((motionController) => {
-            // Hide the default controller mesh
-            if (motionController.rootMesh) motionController.rootMesh.setEnabled(false);
 
-            // When controller mesh loads, attach custom mesh
-            controller.onMeshLoadedObservable.add(() => {
+            // Immediately hide the default mesh
+            if (motionController.rootMesh) {
+                motionController.rootMesh.setEnabled(false);
+                motionController.rootMesh.isVisible = false;
+            }
+
+            // Import custom mesh and parent it to the grip or pointer
+            const loadCustomMesh = () => {
                 BABYLON.SceneLoader.ImportMesh(
                     "",                 // all meshes
                     "/assets/",         // folder path
@@ -35,17 +37,20 @@ export default async function createScene(engine, canvas) {
                     scene,
                     (meshes) => {
                         const customMesh = meshes[0];
-                        // Attach to the grip or pointer
                         customMesh.parent = controller.grip || controller.pointer;
                         customMesh.position = BABYLON.Vector3.Zero();
                         customMesh.rotation = BABYLON.Vector3.Zero();
-
-                        // Optional: replace the rootMesh reference
-                        motionController.rootMesh = customMesh;
                     }
-                ); // <-- closes ImportMesh
-            }); // <-- closes onMeshLoadedObservable.add
-        }); // <-- closes onMotionControllerInitObservable.add
+                );
+            };
+
+            // If mesh already loaded, run immediately
+            if (controller.onMeshLoadedObservable.hasObservers()) {
+                loadCustomMesh();
+            } else {
+                controller.onMeshLoadedObservable.add(loadCustomMesh);
+            }
+        });
     };
 
     // Apply to existing controllers
