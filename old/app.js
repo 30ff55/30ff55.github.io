@@ -21,27 +21,26 @@ export default async function createScene(engine, canvas) {
     const replaceControllerMesh = (controller) => {
 
         controller.onMotionControllerInitObservable.add((motionController) => {
-
-            // When the default model is loaded
             motionController.onModelLoadedObservable.add(() => {
+
+        // hide default mesh
                 if (motionController.rootMesh) {
-                    motionController.rootMesh.setEnabled(false); // hide default
+                    motionController.rootMesh.setEnabled(false);
                     motionController.rootMesh.isVisible = false;
                 }
 
-                // Load your custom mesh
-                BABYLON.SceneLoader.ImportMesh(
-                    "",
-                    "/assets/",
-                    "blaster.glb",
-                    scene,
-                    (meshes) => {
-                        const customMesh = meshes[0];
-                        customMesh.parent = controller.grip || controller.pointer;
-                        customMesh.position = BABYLON.Vector3.Zero();
-                        customMesh.rotation = BABYLON.Vector3.Zero();
-                    }
-                );
+        // load custom mesh
+                BABYLON.SceneLoader.ImportMesh("", "/assets/", "blaster.glb", scene, (meshes) => {
+                    const customMesh = meshes[0];
+
+            // attach to the controller's grip
+                    customMesh.parent = controller.grip || controller.pointer;
+
+            // optional: scale/rotate to match VR controller
+                    customMesh.scaling = new BABYLON.Vector3(0.2,0.2,0.2);
+                    customMesh.position = BABYLON.Vector3.Zero();
+                    customMesh.rotation = BABYLON.Vector3.Zero();
+                });
             });
         });
     };
