@@ -18,10 +18,10 @@ button.addEventListener("click", () => {
     xrHelper.baseExperience.onStateChangedObservable.add((state) => {
         if (state === BABYLON.WebXRState.ENTERING_XR) {
             canvas.style.display = "block";
-            button.style.display = "none";
+            // button.style.display = "none";
         } else if (state === BABYLON.WebXRState.EXITING_XR) {
             canvas.style.display = "none";
-            button.style.display = "block";
+            // button.style.display = "block";
         }
     });
 });
