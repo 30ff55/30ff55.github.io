@@ -20,7 +20,7 @@ export default async function createScene(engine, canvas) {
 
     // Function to replace a controller model
     const replaceControllerMesh = (controller) => {
-        if (controller.motionController) controller.motionController.rootMesh.setEnabled(false);
+        controller.motionController.rootMesh.setEnabled(false);
 
         BABYLON.SceneLoader.ImportMesh(
             "",                 // all meshes
