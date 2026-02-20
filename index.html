@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fengari + Three.js + GLB Loader in Lua</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- Fengari -->
+  <script src="https://cdn.jsdelivr.net/npm/fengari-web/dist/fengari-web.min.js"></script>
+
+  <script type="text/lua">
+    local js = require "js"
+    local window = js.global
+    local document = window.document
+    local navigator = window.navigator
+    local THREE = window.THREE
+    local gltf = new(THREE.GLTFLoader)
+    local new = js.new
+    local conv = function(s) return js.new(js.global.Object, s) end
+    
+    local scene = new(THREE.Scene)
+    local camera = new(THREE.PerspectiveCamera, 75, js.global.innerWidth / js.global.innerHeight, 0.1, 1000)
+    local renderer = new(THREE.WebGLRenderer, conv({antialias=true}))
+    renderer:setSize(js.global.innerWidth, js.global.innerHeight)
+    js.global.document.body:appendChild(renderer.domElement)
+
+    local light = new(THREE.DirectionalLight, 0xffffff, 1)
+    light.position:set(5, 10, 7.5)
+    scene:add(light)
+
+    gltf:load("model.glb",
+      function(model)
+        scene:add(gltf.scene)
+      end,
+      nil,
+      function(err)
+        js.global.console.error(err)
+      end
+    )
+
+    camera.position.z = 5
+
+    local function animate()
+      js.global.requestAnimationFrame(animate)
+      renderer:render(scene, camera)
+    end
+
+    animate()
+  </script>
+</body>
+</html>
