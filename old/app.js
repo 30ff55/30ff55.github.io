@@ -20,20 +20,20 @@ export default async function createScene(engine, canvas) {
 
     // Function to replace a controller model
     const replaceControllerMesh = (controller) => {
-        controller.motionController.rootMesh.setEnabled(false);
-
-        BABYLON.SceneLoader.ImportMesh(
-            "",                 // all meshes
-            "/assets/",         // folder path
-            "blaster.glb",      // file name
-            scene,
-            (meshes) => {
-                const customMesh = meshes[0];
-                customMesh.parent = controller.grip || controller.pointer;
-                customMesh.position = BABYLON.Vector3.Zero();
-                customMesh.rotation = BABYLON.Vector3.Zero();
-            }
-        );
+        controller.onMotionControllerInitObservable.add((motionController) => {                                                            
+            motionController.setEnabled(false);                                                                                              
+            controller.onMeshLoadedObservable.add((mesh)=>{                           
+                BABYLON.SceneLoader.ImportMesh(
+                "",                 // all meshes
+                "/assets/",         // folder path
+                "blaster.glb",      // file name
+                scene,
+                (meshes) => {
+                    const customMesh = meshes[0];
+                    motionController.rootMesh = customMesh;
+                }
+            );
+        });         
     };
 
     // Replace current controllers
