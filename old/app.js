@@ -1,3 +1,5 @@
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 export default async function createScene(engine, canvas) {
     const scene = new BABYLON.Scene(engine);
 
@@ -24,6 +26,7 @@ export default async function createScene(engine, canvas) {
 
             // When the default model is loaded
             motionController.onModelLoadedObservable.add(() => {
+                await wait(100)
                 if (motionController.rootMesh) {
                     motionController.rootMesh.setEnabled(false); // hide default
                     motionController.rootMesh.isVisible = false;
