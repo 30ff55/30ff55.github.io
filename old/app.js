@@ -1,4 +1,4 @@
-export default function createScene(engine, canvas) {
+export default async function createScene(engine, canvas) {
     // This creates a basic Babylon Scene object (non-mesh)
     var scene = new BABYLON.Scene(engine);
 
