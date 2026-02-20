@@ -7,7 +7,7 @@ const engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, s
 window.engine = engine;
 window.canvas = canvas;
 
-const scene = createScene(engine, canvas);
+const scene = await createScene(engine, canvas);
 
 const xrHelper = scene.xrHelper
 
