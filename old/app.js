@@ -18,29 +18,41 @@ export default async function createScene(engine, canvas) {
     // --- VR Setup ---
     const xrHelper = await scene.createDefaultXRExperienceAsync();
 
-    // Function to replace a controller model
+    // Helper function to replace controller meshes
     const replaceControllerMesh = (controller) => {
-        controller.onMotionControllerInitObservable.add((motionController) => {                                                            
-            motionController.setEnabled(false);                                                                                              
-            controller.onMeshLoadedObservable.add((mesh)=>{                           
+
+        // Wait for motion controller initialization
+        controller.onMotionControllerInitObservable.add((motionController) => {
+            // Hide the default controller mesh
+            if (motionController.rootMesh) motionController.rootMesh.setEnabled(false);
+
+            // When controller mesh loads, attach custom mesh
+            controller.onMeshLoadedObservable.add(() => {
                 BABYLON.SceneLoader.ImportMesh(
-                "",                 // all meshes
-                "/assets/",         // folder path
-                "blaster.glb",      // file name
-                scene,
-                (meshes) => {
-                    const customMesh = meshes[0];
-                    motionController.rootMesh = customMesh;
-                };
-            );
-        });         
+                    "",                 // all meshes
+                    "/assets/",         // folder path
+                    "blaster.glb",      // file name
+                    scene,
+                    (meshes) => {
+                        const customMesh = meshes[0];
+                        // Attach to the grip or pointer
+                        customMesh.parent = controller.grip || controller.pointer;
+                        customMesh.position = BABYLON.Vector3.Zero();
+                        customMesh.rotation = BABYLON.Vector3.Zero();
+
+                        // Optional: replace the rootMesh reference
+                        motionController.rootMesh = customMesh;
+                    }
+                ); // <-- closes ImportMesh
+            }); // <-- closes onMeshLoadedObservable.add
+        }); // <-- closes onMotionControllerInitObservable.add
     };
 
-    // Replace current controllers
+    // Apply to existing controllers
     xrHelper.input.controllers.forEach(replaceControllerMesh);
 
-    // Replace future controllers as they connect
+    // Apply to future controllers
     xrHelper.input.onControllerAddedObservable.add(replaceControllerMesh);
 
     return { scene, xrHelper };
-};
+}
