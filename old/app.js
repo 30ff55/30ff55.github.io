@@ -26,5 +26,27 @@ export default function createScene(engine, canvas) {
     // Our built-in 'ground' shape.
     var ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
 
+    // --- VR Setup ---
+    const xrHelper = await scene.createDefaultXRExperienceAsync();
+
+    // Hide default controller models and attach custom ones
+    xrHelper.input.controllers.forEach((controller) => {
+        if (controller.motionController) controller.motionController.rootMesh.setEnabled(false);
+
+        // Load your custom controller mesh
+        BABYLON.SceneLoader.ImportMesh(
+            "",                 // all meshes
+            "/assets/",         // folder path
+            "blaster.glb", // file name
+            scene,
+            (meshes) => {
+                const customMesh = meshes[0];
+                customMesh.parent = controller.grip || controller.pointer; // follow controller
+                customMesh.position = BABYLON.Vector3.Zero();
+                customMesh.rotation = BABYLON.Vector3.Zero();
+            }
+        );
+    });
+
     return scene;
 };
