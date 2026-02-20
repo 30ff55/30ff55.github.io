@@ -11,5 +11,9 @@ const scene = createScene(engine, canvas);
 
 const xrHelper = await scene.createDefaultXRExperienceAsync();
 
+document.getElementById("enterVRBtn").addEventListener("click", () => {
+    xrHelper.baseExperience.enterXRAsync("immersive-vr", "local-floor");
+});
+
 engine.runRenderLoop(()=>scene.render());
 addEventListener('resize', ()=>engine.resize());
