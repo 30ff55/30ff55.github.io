@@ -31,7 +31,7 @@ export default async function createScene(engine, canvas) {
                 (meshes) => {
                     const customMesh = meshes[0];
                     motionController.rootMesh = customMesh;
-                }
+                });
             );
         });         
     };
