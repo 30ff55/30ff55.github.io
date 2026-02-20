@@ -18,30 +18,34 @@ export default async function createScene(engine, canvas) {
     // VR setup
     const xrHelper = await scene.createDefaultXRExperienceAsync();
 
+    // Function to replace the controller mesh with a custom blaster
     const replaceControllerMesh = (controller) => {
         controller.onMotionControllerInitObservable.add((motionController) => {
-            motionController.onModelLoadedObservable.add(() => {
-                // Import your blaster and set it as the rootMesh
-                BABYLON.SceneLoader.ImportMesh("", "/assets/", "blaster.glb", scene, (meshes) => {
-                    const customMesh = meshes[0];
+            // Import your blaster GLB
+            BABYLON.SceneLoader.ImportMesh("", "/assets/", "blaster.glb", scene, (meshes) => {
+                // Create a parent node for the imported mesh
+                const customMeshRoot = new BABYLON.TransformNode("blasterRoot", scene);
 
-                    // Set as rootMesh
-                    motionController.rootMesh.dispose(); // remove old default
-                    motionController.rootMesh = customMesh;
+                // Parent all loaded meshes to the root
+                meshes.forEach((m) => m.parent = customMeshRoot);
 
-                    // Make sure it moves with the grip or pointer
-                    customMesh.parent = controller.grip || controller.pointer;
-                    customMesh.position = BABYLON.Vector3.Zero();
-                    customMesh.rotation = BABYLON.Vector3.Zero();
-                    customMesh.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2); // adjust size if needed
-                });
+                // Parent the custom mesh to the grip (or pointer if no grip)
+                customMeshRoot.parent = controller.grip || controller.pointer;
+                customMeshRoot.position.set(0, 0, 0);
+                customMeshRoot.rotation.set(0, 0, 0);
+                customMeshRoot.scaling.set(0.2, 0.2, 0.2); // adjust size if needed
+
+                // Optionally hide the default controller mesh
+                if (motionController.rootMesh) {
+                    motionController.rootMesh.setEnabled(false);
+                }
             });
         });
     };
 
-    // Existing controllers
+    // Replace existing controllers
     xrHelper.input.controllers.forEach(replaceControllerMesh);
-    // Future controllers
+    // Replace any future controllers
     xrHelper.input.onControllerAddedObservable.add(replaceControllerMesh);
 
     return { scene, xrHelper };
