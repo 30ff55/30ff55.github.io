@@ -9,7 +9,7 @@ window.canvas = canvas;
 
 const scene = createScene(engine, canvas);
 
-const xrHelper = await scene.createDefaultXRExperienceAsync();
+const xrHelper = scene.xrHelper
 
 const button = document.getElementById("enterVRBtn")
 button.addEventListener("click", () => {
@@ -26,5 +26,5 @@ button.addEventListener("click", () => {
     });
 });
 
-engine.runRenderLoop(()=>scene.render());
+engine.runRenderLoop(()=>scene.scene.render());
 addEventListener('resize', ()=>engine.resize());
