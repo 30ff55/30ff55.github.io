@@ -3,7 +3,7 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 export default async function createScene(engine, canvas) {
     const scene = new BABYLON.Scene(engine);
 
-    // Camera
+    // --- Camera ---
     const camera = new BABYLON.FreeCamera(
         "camera1",
         new BABYLON.Vector3(0, 5, -10),
@@ -12,7 +12,7 @@ export default async function createScene(engine, canvas) {
     camera.setTarget(BABYLON.Vector3.Zero());
     camera.attachControl(canvas, true);
 
-    // Light
+    // --- Light ---
     const light = new BABYLON.HemisphericLight(
         "light",
         new BABYLON.Vector3(0, 1, 0),
@@ -20,7 +20,7 @@ export default async function createScene(engine, canvas) {
     );
     light.intensity = 0.7;
 
-    // Sphere & Ground
+    // --- Environment ---
     const sphere = BABYLON.MeshBuilder.CreateSphere(
         "sphere",
         { diameter: 2, segments: 32 },
@@ -34,47 +34,67 @@ export default async function createScene(engine, canvas) {
         scene
     );
 
-    // XR setup
-    const xrHelper = await scene.createDefaultXRExperienceAsync();
+    // --- XR Setup ---
+    const xrHelper = await scene.createDefaultXRExperienceAsync({
+        floorMeshes: [ground]
+    });
 
+    /**
+     * Function to swap the default controller model for a custom blaster
+     */
     const replaceControllerMesh = (controller) => {
         controller.onMotionControllerInitObservable.add((motionController) => {
-
+            
             motionController.onModelLoadedObservable.add(async () => {
-
-                // Wait 100ms
+                // 1. Brief wait to ensure the system is ready
                 await wait(100);
 
-                // Hide default controller model
-                motionController.rootMesh?.setEnabled(false);
+                // 2. Hide the default controller model
+                if (motionController.rootMesh) {
+                    motionController.rootMesh.setEnabled(false);
+                }
 
-                // Load custom blaster
-                const result = await ImportMeshAsync("assets/blaster.glb", this._scene);
-                // Create root transform node
-                const customRoot = new BABYLON.TransformNode("blasterRoot", scene);
+                try {
+                    // 3. Load the custom blaster
+                    // Note: Use BABYLON.SceneLoader and the 'scene' variable from the outer scope
+                    const result = await BABYLON.SceneLoader.ImportMeshAsync(
+                        "", 
+                        "assets/", 
+                        "blaster.glb", 
+                        scene
+                    );
 
-                // Parent all meshes from GLB
-                result.meshes.forEach(mesh => {
-                    mesh.parent = customRoot;
-                });
+                    // 4. Get the root of the imported model
+                    const blasterRoot = result.meshes[0];
 
-                // Attach to controller grip (preferred) or pointer
-                customRoot.parent = controller.grip || controller.pointer;
+                    // 5. Parent it to the controller's "grip" (the physical hand position)
+                    blasterRoot.parent = controller.grip || controller.pointer;
 
-                // Reset transforms
-                customRoot.position = BABYLON.Vector3.Zero();
-                customRoot.rotation = BABYLON.Vector3.Zero();
+                    // 6. Reset transforms
+                    blasterRoot.position = BABYLON.Vector3.Zero();
+                    
+                    // Crucial: GLBs often use Quaternions; we clear it to use standard Euler rotation
+                    blasterRoot.rotationQuaternion = null; 
+                    
+                    // Rotate 180 degrees (Math.PI) if the gun points at the player
+                    blasterRoot.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+                    
+                    // Adjust scale
+                    blasterRoot.scaling.setAll(0.2);
 
-                // Scale down if needed
-                customRoot.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
+                    console.log(`Blaster attached to ${controller.uniqueId}`);
+
+                } catch (error) {
+                    console.error("Failed to load blaster mesh:", error);
+                }
             });
         });
     };
 
-    // Existing controllers
+    // Handle controllers already connected
     xrHelper.input.controllers.forEach(replaceControllerMesh);
 
-    // Future controllers
+    // Handle controllers connected later
     xrHelper.input.onControllerAddedObservable.add(replaceControllerMesh);
 
     return { scene, xrHelper };
