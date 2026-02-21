@@ -40,58 +40,82 @@ export default async function createScene(engine, canvas) {
     });
 
     /**
-     * Function to swap the default controller model for a custom blaster
+     * Replace default controller model with left/right hand model
      */
     const replaceControllerMesh = (controller) => {
         controller.onMotionControllerInitObservable.add((motionController) => {
-            
             motionController.onModelLoadedObservable.add(async () => {
-                // 1. Brief wait to ensure the system is ready
                 await wait(100);
 
-                // 2. Hide the default controller model
-                if (motionController.rootMesh) {
-                    motionController.rootMesh.setEnabled(false);
-                }
+                if (motionController.rootMesh) motionController.rootMesh.setEnabled(false);
 
                 try {
-                    // 3. Load the custom blaster
-                    // Note: Use BABYLON.SceneLoader and the 'scene' variable from the outer scope
+                    const handModel = motionController.handness === "left"
+                        ? "LeftHand.fbx"
+                        : "RightHand.fbx";
+
                     const result = await BABYLON.SceneLoader.ImportMeshAsync(
                         "", 
                         "assets/", 
-                        "LeftHand.fbx", 
+                        handModel, 
                         scene
                     );
 
-                    // 4. Get the root of the imported model
-                    const blasterRoot = result.meshes[0];
+                    const handRoot = result.meshes[0];
+                    handRoot.parent = controller.grip || controller.pointer;
+                    handRoot.position = BABYLON.Vector3.Zero();
+                    handRoot.rotationQuaternion = null;
+                    handRoot.rotation = new BABYLON.Vector3(Math.PI/2, Math.PI, 0);
+                    handRoot.scaling.setAll(1);
 
-                    // 5. Parent it to the controller's "grip" (the physical hand position)
-                    blasterRoot.parent = controller.grip || controller.pointer;
+                    console.log(`${handModel} attached to ${motionController.handness} hand`);
 
-                    // 6. Reset transforms
-                    blasterRoot.position = BABYLON.Vector3.Zero();
-                    
-                    // Crucial: GLBs often use Quaternions; we clear it to use standard Euler rotation
-                    blasterRoot.rotationQuaternion = null; 
-                    
-                    // Rotate 180 degrees (Math.PI) if the gun points at the player
-                    blasterRoot.rotation = new BABYLON.Vector3(Math.PI/2, Math.PI, 0);
-                    
-                    // Adjust scale
-                    blasterRoot.scaling.setAll(1);
+                    // Store reference for animation
+                    controller.handMesh = handRoot;
 
-                    console.log(`Blaster attached to ${controller.uniqueId}`);
+                    // Start animating fingers
+                    animateHand(controller);
 
-                } catch (error) {
-                    console.error("Failed to load blaster mesh:", error);
+                } catch (err) {
+                    console.error("Failed to load hand mesh:", err);
                 }
             });
         });
     };
 
-    // Handle controllers already connected
+    /**
+     * Animate hand based on trigger and grip values
+     */
+    const animateHand = (controller) => {
+        if (!controller.handMesh || !controller.motionController) return;
+
+        const motionController = controller.motionController;
+
+        scene.onBeforeRenderObservable.add(() => {
+            const trigger = motionController.getComponent("trigger");
+            const squeeze = motionController.getComponent("squeeze");
+
+            if (!trigger || !squeeze) return;
+
+            const hand = controller.handMesh;
+
+            // Animate index finger (trigger)
+            const index = hand.getChildMeshes().find(m => m.name.toLowerCase().includes("index"));
+            if (index) index.rotation.x = -trigger.value * Math.PI/2;
+
+            // Animate middle, ring, pinky (squeeze)
+            ["middle","ring","pinky"].forEach(name => {
+                const f = hand.getChildMeshes().find(m => m.name.toLowerCase().includes(name));
+                if (f) f.rotation.x = -squeeze.value * Math.PI/2;
+            });
+
+            // Animate thumb (squeeze)
+            const thumb = hand.getChildMeshes().find(m => m.name.toLowerCase().includes("thumb"));
+            if (thumb) thumb.rotation.x = -squeeze.value * Math.PI/4;
+        });
+    };
+
+    // Handle already-connected controllers
     xrHelper.input.controllers.forEach(replaceControllerMesh);
 
     // Handle controllers connected later
