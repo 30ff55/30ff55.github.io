@@ -60,7 +60,7 @@ export default async function createScene(engine, canvas) {
                     const result = await BABYLON.SceneLoader.ImportMeshAsync(
                         "", 
                         "assets/", 
-                        "blaster.glb", 
+                        "LeftHand.fbx", 
                         scene
                     );
 
