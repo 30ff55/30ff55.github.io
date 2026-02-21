@@ -77,10 +77,10 @@ export default async function createScene(engine, canvas) {
                     blasterRoot.rotationQuaternion = null; 
                     
                     // Rotate 180 degrees (Math.PI) if the gun points at the player
-                    blasterRoot.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+                    blasterRoot.rotation = new BABYLON.Vector3(Math.PI/2/4, Math.PI, 0);
                     
                     // Adjust scale
-                    blasterRoot.scaling.setAll(0.2);
+                    blasterRoot.scaling.setAll(1);
 
                     console.log(`Blaster attached to ${controller.uniqueId}`);
 
